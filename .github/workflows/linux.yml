@@ -10,13 +10,17 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest]
+        os: [ubuntu-latest, fedora-latest, debian-latest]
         compiler: [gcc, clang]
 
     steps:
       - uses: actions/checkout@v3
       - name: Install dependencies
+        if: ${{ startsWith(matrix.os, 'ubuntu') || startsWith(matrix.os, 'debian') }}
         run: sudo apt install autoconf-archive bison flex libmhash-dev libpcre2-dev zlib1g-dev check
+      - name: Install dependencies
+        if: ${{ startsWith(matrix.os, 'fedora') }}
+        run: sudo dnf install gcc make bison flex pcre-devel libgpg-error-devel libgcrypt-devel zlib-devel libcurl-devel libacl-devel pkgconfig(libselinux) libattr-devel e2fsprogs-devel audit-libs-devel autoconf automake libtool
       - name: autoconf
         run: sh autogen.sh
       - name: configure
